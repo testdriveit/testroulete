@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script>
+            $(document).ready(function(){
+              $('h1').hide();
+
+              $("#spin").click(function(){
+                $('#stat_1').hide()
+                $('#stat_2').hide()
+                $.post("/roulete/", {csrfmiddlewaretoken: '{{ csrf_token }}'}, function(data){
+                    $('h1').show()
+                    $('#lucky_number').text('Счастливое число: ' + data['lucky_number']);
+                    $('h1').show()
+                })
+              });
+
+              $('#statistic').click(function(){
+                $.get("/roulete/", {csrfmiddlewaretoken: '{{ csrf_token }}', command: 'stat'}, function(data){
+                  $('h1').hide();
+                  $('#stat_1').text('')
+                  $('#stat_1').append('<tr><th> Раунд </th><th> Количество участников </th><tr>')
+                  for (let key in data[0]){
+                    $('#stat_1').append('<tr><td>' + key + '</td><td>' + data[0][key] + '</td><tr>')
+                  }
+                  $('#stat_2').text('')
+                  $('#stat_2').append('<tr><th> id пользователя </th><th> Количество раундов </th><th> Среднее количество кликов </th><tr>')
+                    for (let key in data[1]){
+                    $('#stat_2').append('<tr><td>' + key + '</td><td>' + data[1][key]['round_nums'] + '</td><td>' + data[1][key]['round_clicks_avg'] + '</td><tr>')
+                  }
+                  $('#stat_1').show()
+                  $('#stat_2').show()
+                })
+              })
+            });
+        </script>
+    </head>
+<body>
+
+<h1 id="lucky_number"></h1>
+
+<button id="spin">Крутить рулетку</button>
+<button id="statistic">Отобразить статистику</button>
+<table id="stat_1"></table><br><br>
+<table id="stat_2"></table><br><br>
+
+</body>
+</html>
